@@ -3,6 +3,7 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigService } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { UsersModule } from './users/users.module';
 import configuration from '../config/configuration';
 
 @Module({
@@ -19,13 +20,14 @@ import configuration from '../config/configuration';
         username: config.get<string>('database.user'),
         password: config.get<string>('database.password'),
         database: config.get<string>('database.database'),
-        entities: ['**/*.entity{.ts,.js}'],
+        autoLoadEntities: true,
         logging: true,
         synchronize: config.get<string>('mode') === 'development',
         ssl: config.get<string>('mode') === 'production',
       }),
       inject: [ConfigService],
     }),
+    UsersModule,
   ],
   controllers: [AppController],
   providers: [AppService],
