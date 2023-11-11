@@ -7,4 +7,5 @@ export default () => ({
     password: process.env.POSTGRES_PASSWORD,
     database: process.env.POSTGRES_DATABASE,
   },
+  mode: process.env.APP_MODE || 'production',
 });
