@@ -1,4 +1,4 @@
-import { ConflictException, Injectable, InternalServerErrorException } from '@nestjs/common';
+import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -10,7 +10,6 @@ import { ConfigService } from '@nestjs/config';
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    // TODO: fix this
     private readonly configService: ConfigService,
   ) {}
 
@@ -40,9 +39,13 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  // findOne(id: number) {
-  //   return `This action returns a #${id} user`;
-  // }
+  async findOne(id: number): Promise<User> {
+    const [user] = await this.usersRepository.find({ where: { id } });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${id} was not found`);
+    }
+    return user;
+  }
 
   // update(id: number, updateUserDto: UpdateUserDto) {
   //   return `This action updates a #${id} user`;
