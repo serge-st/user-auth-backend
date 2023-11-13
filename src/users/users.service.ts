@@ -3,20 +3,18 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { PasswordUtils } from './utils/password.utils';
-import { ConfigService } from '@nestjs/config';
+import { UtilsService } from 'src/utils/utils.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
-    private readonly configService: ConfigService,
+    private readonly passwordUtils: UtilsService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password } = createUserDto;
-    const saltRounds = parseInt(this.configService.get<string>('SALT_ROUNDS'));
-    const hashedPassword = await PasswordUtils.hashPassword(password, saltRounds);
+    const hashedPassword = await this.passwordUtils.hashPassword(password);
     const newUser = this.usersRepository.create({
       ...createUserDto,
       password: hashedPassword,
