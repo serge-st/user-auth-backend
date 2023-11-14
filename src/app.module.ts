@@ -1,11 +1,12 @@
 import { Module } from '@nestjs/common';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
-import { ConfigModule, ConfigService } from '@nestjs/config';
+import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersModule } from './users/users.module';
 import { UtilsModule } from './utils/utils.module';
 import configuration from '../config/configuration';
+import { UtilsService } from './utils/utils.service';
 
 @Module({
   imports: [
@@ -13,20 +14,11 @@ import configuration from '../config/configuration';
       load: [configuration],
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule],
-      useFactory: (config: ConfigService) => ({
-        type: 'postgres',
-        host: config.get<string>('database.host'),
-        port: config.get<number>('database.port'),
-        username: config.get<string>('database.user'),
-        password: config.get<string>('database.password'),
-        database: config.get<string>('database.database'),
-        autoLoadEntities: true,
-        logging: true,
-        synchronize: config.get<string>('mode') === 'development',
-        ssl: config.get<string>('mode') === 'production',
-      }),
-      inject: [ConfigService],
+      imports: [UtilsModule],
+      inject: [UtilsService],
+      useFactory: (utilsService: UtilsService) => {
+        return utilsService.getDBConfig();
+      },
     }),
     UsersModule,
     UtilsModule,
