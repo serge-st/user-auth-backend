@@ -29,7 +29,6 @@ export class UsersService {
         throw new InternalServerErrorException();
       }
     }
-    delete newUser.password;
     return newUser;
   }
 
