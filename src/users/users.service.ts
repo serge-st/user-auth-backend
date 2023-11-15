@@ -1,4 +1,10 @@
-import { ConflictException, Injectable, InternalServerErrorException, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ConflictException,
+  Injectable,
+  InternalServerErrorException,
+  NotFoundException,
+} from '@nestjs/common';
 import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
@@ -33,7 +39,7 @@ export class UsersService {
     return newUser;
   }
 
-  async findAll(): Promise<User[]> {
+  async getAll(): Promise<User[]> {
     return await this.usersRepository.find();
   }
 
@@ -41,6 +47,21 @@ export class UsersService {
     const [user] = await this.usersRepository.find({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} was not found`);
+    }
+    return user;
+  }
+
+  async getByUsernameOrEmail(username: string = '', email: string = ''): Promise<User> {
+    if (!username && !email) {
+      throw new BadRequestException('Either username or email must be provided');
+    }
+
+    const user = await this.usersRepository
+      .createQueryBuilder('user')
+      .where('user.username = :username OR user.email = :email', { username, email })
+      .getOne();
+    if (!user) {
+      throw new NotFoundException('User was not found');
     }
     return user;
   }

@@ -26,12 +26,12 @@ export class UsersController {
   }
 
   @Get()
-  findAll(): Promise<User[]> {
-    return this.usersService.findAll();
+  getAll(): Promise<User[]> {
+    return this.usersService.getAll();
   }
 
   @Get(':id')
-  findOne(@Param('id') id: string) {
+  getById(@Param('id') id: string) {
     return this.usersService.getById(parseInt(id));
   }
 

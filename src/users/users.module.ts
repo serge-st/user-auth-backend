@@ -9,5 +9,6 @@ import { UtilsModule } from 'src/utils/utils.module';
   imports: [TypeOrmModule.forFeature([User]), UtilsModule],
   controllers: [UsersController],
   providers: [UsersService],
+  exports: [UsersService],
 })
 export class UsersModule {}
