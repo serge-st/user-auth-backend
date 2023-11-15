@@ -37,7 +37,7 @@ export class UsersService {
     return await this.usersRepository.find();
   }
 
-  async findOne(id: number): Promise<User> {
+  async getById(id: number): Promise<User> {
     const [user] = await this.usersRepository.find({ where: { id } });
     if (!user) {
       throw new NotFoundException(`User with ID ${id} was not found`);
@@ -46,7 +46,7 @@ export class UsersService {
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
-    const user = await this.findOne(id);
+    const user = await this.getById(id);
     const { password } = updateUserDto;
     if (password) {
       const hashedPassword = await this.utilsService.hashPassword(password);
