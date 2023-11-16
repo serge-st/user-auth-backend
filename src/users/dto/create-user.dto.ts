@@ -1,6 +1,6 @@
 import { IsNotEmpty, IsBoolean, IsString, IsEmail, IsOptional, Matches, Length } from 'class-validator';
 
-const usernameRegex = /^(?=.*$)(?![_])[a-zA-Z0-9_]+(?<![_])$/;
+export const usernameRegex = /^(?=.*$)(?![_])[a-zA-Z0-9_]+(?<![_])$/;
 const passwordRegex = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
 export class CreateUserDto {

@@ -56,14 +56,25 @@ export class UsersService {
       throw new BadRequestException('Either username or email must be provided');
     }
 
-    const user = await this.usersRepository
-      .createQueryBuilder('user')
-      .where('user.username = :username OR user.email = :email', { username, email })
-      .getOne();
-    if (!user) {
-      throw new NotFoundException('User was not found');
+    if (username) {
+      const userByUsername = await this.usersRepository
+        .createQueryBuilder('user')
+        .where('user.username = :username', { username })
+        .getOne();
+
+      if (userByUsername) return userByUsername;
     }
-    return user;
+
+    if (email) {
+      const userByEmail = await this.usersRepository
+        .createQueryBuilder('user')
+        .where('user.email = :email', { email })
+        .getOne();
+
+      if (userByEmail) return userByEmail;
+    }
+
+    throw new NotFoundException('User was not found');
   }
 
   async update(id: number, updateUserDto: UpdateUserDto): Promise<User> {
