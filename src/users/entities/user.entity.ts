@@ -21,4 +21,9 @@ export class User {
 
   @Column({ type: 'varchar', length: 50, nullable: true })
   name: string;
+
+  // TODO:
+  // add column when user was created
+
+  // add column when user last logged in
 }

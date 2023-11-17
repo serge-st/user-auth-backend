@@ -14,4 +14,12 @@ export class AuthController {
     const { username, email, password } = authCredentialsDto;
     return this.authService.signIn(username, email, password);
   }
+
+  // TODO: screate singup endpoint
+
+  // TODO: implement signOut -> delete token from DB
+  @Post('logout')
+  signOut() {
+    // return this.authService.signOut();
+  }
 }

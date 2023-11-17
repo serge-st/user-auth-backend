@@ -3,6 +3,7 @@ import * as bcrypt from 'bcrypt';
 import { InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
+import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UtilsService {
@@ -34,5 +35,9 @@ export class UtilsService {
       synchronize: this.configService.get<string>('mode') === 'development',
       ssl: this.configService.get<string>('mode') === 'production',
     };
+  }
+
+  getUUID(): string {
+    return uuidv4();
   }
 }
