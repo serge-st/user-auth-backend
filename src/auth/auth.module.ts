@@ -7,9 +7,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { ConfigModule } from '@nestjs/config';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
+import { MailModule } from 'src/mail/mail.module';
 
 @Module({
-  imports: [UsersModule, UtilsModule, ConfigModule, JwtModule.register({})],
+  imports: [UsersModule, UtilsModule, ConfigModule, JwtModule.register({}), MailModule],
   providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
   controllers: [AuthController],
 })

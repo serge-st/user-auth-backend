@@ -1,6 +1,5 @@
-import { IsNotEmpty, IsBoolean, IsString, IsEmail, IsOptional, Matches, Length } from 'class-validator';
-
-export const usernameRegex = /^(?=.*$)(?![_])[a-zA-Z0-9_]+(?<![_])$/;
+import { IsNotEmpty, IsString, IsEmail, IsOptional, Matches, Length } from 'class-validator';
+const usernameRegex = /^(?=.*$)(?![_])[a-zA-Z0-9_]+(?<![_])$/;
 const passwordRegex = /((?=.*\d)|(?=.*\W+))(?![.\n])(?=.*[A-Z])(?=.*[a-z]).*$/;
 
 export class CreateUserDto {
@@ -22,10 +21,6 @@ export class CreateUserDto {
     message: `The password is too weak. The password should contain at least 1 upper case letter, 1 lower case letter, 1 number or special character`,
   })
   password: string;
-
-  @IsOptional()
-  @IsBoolean()
-  isActive?: boolean;
 
   @IsString()
   @IsOptional()

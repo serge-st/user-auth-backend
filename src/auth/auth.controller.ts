@@ -1,6 +1,7 @@
 import { Body, Controller, Post, HttpCode, HttpStatus } from '@nestjs/common';
 import { AuthService } from './auth.service';
 import { AuthCredentialsDto } from './dto/auth-credentials.dto';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
 @Controller('auth')
 export class AuthController {
@@ -13,7 +14,11 @@ export class AuthController {
     return this.authService.signIn(username, email, password);
   }
 
-  // TODO: screate singup endpoint
+  // TODO: return tokens and user object
+  @Post('signup')
+  create(@Body() createUserDto: CreateUserDto) {
+    return this.authService.signUp(createUserDto);
+  }
 
   // TODO: implement signOut -> delete token from DB
   @Post('logout')

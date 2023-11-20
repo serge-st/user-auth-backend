@@ -11,14 +11,12 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UtilsService } from 'src/utils/utils.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { MailService } from 'src/mail/mail.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly utilsService: UtilsService,
-    private readonly mailService: MailService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -38,9 +36,6 @@ export class UsersService {
         throw new InternalServerErrorException();
       }
     }
-    const activationLink = this.utilsService.getUUID();
-    // TODO: Should I save activationLink to the users table?
-    await this.mailService.sendActivationLink(newUser.email, activationLink);
     return newUser;
   }
 

@@ -1,19 +1,8 @@
-import { IsEmail, IsNotEmpty, IsOptional, IsString, Matches } from 'class-validator';
-import { usernameRegex } from 'src/users/dto/create-user.dto';
+import { OmitType, PartialType } from '@nestjs/mapped-types';
+import { IsNotEmpty, IsString } from 'class-validator';
+import { CreateUserDto } from 'src/users/dto/create-user.dto';
 
-export class AuthCredentialsDto {
-  @IsString()
-  @IsOptional()
-  @Matches(usernameRegex, {
-    message: `username must contain only letters, numbers, and underscores, and should not start or end with an underscore.`,
-  })
-  username?: string;
-
-  @IsString()
-  @IsOptional()
-  @IsEmail()
-  email?: string;
-
+export class AuthCredentialsDto extends PartialType(OmitType(CreateUserDto, ['name'] as const)) {
   @IsNotEmpty()
   @IsString()
   password: string;
