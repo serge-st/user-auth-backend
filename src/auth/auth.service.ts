@@ -13,6 +13,7 @@ import { JWTPayload } from './types/jwt-payload.type';
 import { SignInResponse } from './types/singin-response.type';
 import { CreateUserDto } from 'users/dto/create-user.dto';
 import { MailService } from 'mail/mail.service';
+import { User } from 'users/entities/user.entity';
 
 @Injectable()
 export class AuthService {
@@ -24,7 +25,8 @@ export class AuthService {
     private readonly configService: ConfigService,
   ) {}
 
-  async generateTokens(payload: JWTPayload): Promise<SignInResponse> {
+  async generateTokens(userInfo: User): Promise<SignInResponse> {
+    const payload: JWTPayload = { sub: userInfo.id, username: userInfo.username };
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(payload, {
         expiresIn: 60 * 15,
@@ -41,12 +43,12 @@ export class AuthService {
     };
   }
 
-  async signUp(createUserDto: CreateUserDto) {
+  async signUp(createUserDto: CreateUserDto): Promise<SignInResponse> {
     const newUser = await this.usersService.create(createUserDto);
     const activationLink = this.utilsService.getUUID();
     // TODO: Should I save activationLink to the users table?
     await this.mailService.sendActivationLink(newUser.email, activationLink);
-    return 'signUp';
+    return await this.generateTokens(newUser);
   }
 
   async signIn(username: string, email: string, password: string): Promise<SignInResponse> {
@@ -57,8 +59,7 @@ export class AuthService {
         throw new UnauthorizedException('Please check you login credentials');
       }
 
-      const payload: JWTPayload = { sub: user.id, username: user.username };
-      return await this.generateTokens(payload);
+      return await this.generateTokens(user);
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException('Please check your login credentials');
