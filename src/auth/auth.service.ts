@@ -5,14 +5,14 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
-import { UsersService } from '../users/users.service';
-import { UtilsService } from 'src/utils/utils.service';
+import { UsersService } from 'users/users.service';
+import { UtilsService } from 'utils/utils.service';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { JWTPayload } from './types/jwt-payload.type';
 import { SignInResponse } from './types/singin-response.type';
-import { CreateUserDto } from 'src/users/dto/create-user.dto';
-import { MailService } from 'src/mail/mail.service';
+import { CreateUserDto } from 'users/dto/create-user.dto';
+import { MailService } from 'mail/mail.service';
 
 @Injectable()
 export class AuthService {

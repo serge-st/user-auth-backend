@@ -9,7 +9,7 @@ import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
-import { UtilsService } from 'src/utils/utils.service';
+import { UtilsService } from 'utils/utils.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 
 @Injectable()

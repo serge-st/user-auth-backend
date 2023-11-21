@@ -3,13 +3,13 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { ConfigModule } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { UsersModule } from './users/users.module';
-import { UtilsModule } from './utils/utils.module';
+import { UsersModule } from 'users/users.module';
+import { UtilsModule } from 'utils/utils.module';
 import configuration from '../config/configuration';
-import { UtilsService } from './utils/utils.service';
-import { AuthModule } from './auth/auth.module';
+import { UtilsService } from 'utils/utils.service';
+import { AuthModule } from 'auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
-import { MailModule } from './mail/mail.module';
+import { MailModule } from 'mail/mail.module';
 
 @Module({
   imports: [
