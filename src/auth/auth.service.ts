@@ -48,18 +48,22 @@ export class AuthService {
     const activationLink = this.utilsService.getUUID();
     // TODO: Should I save activationLink to the users table?
     await this.mailService.sendActivationLink(newUser.email, activationLink);
-    return await this.generateTokens(newUser);
+    const tokens = await this.generateTokens(newUser);
+    await this.saveRefreshToken(newUser.id, tokens.refresh_token);
+    return tokens;
   }
 
   async signIn(username: string, email: string, password: string): Promise<SignInResponse> {
     try {
       const user = await this.usersService.getByUsernameOrEmail(username, email);
-      const isPasswordValid = await this.utilsService.comparePassword(password, user.password);
+      const isPasswordValid = await this.utilsService.compareHash(password, user.password);
       if (!isPasswordValid) {
         throw new UnauthorizedException('Please check you login credentials');
       }
 
-      return await this.generateTokens(user);
+      const tokens = await this.generateTokens(user);
+      await this.saveRefreshToken(user.id, tokens.refresh_token);
+      return tokens;
     } catch (error) {
       if (error instanceof NotFoundException) {
         throw new UnauthorizedException('Please check your login credentials');
@@ -69,5 +73,10 @@ export class AuthService {
       }
       throw new InternalServerErrorException();
     }
+  }
+
+  async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
+    const tokenHash = await this.utilsService.hashData(refreshToken);
+    console.log('saveRefreshToken', userId, tokenHash);
   }
 }

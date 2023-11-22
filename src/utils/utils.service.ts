@@ -8,18 +8,18 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class UtilsService {
   constructor(private readonly configService: ConfigService) {}
-  async hashPassword(password: string): Promise<string> {
+  async hashData(data: string): Promise<string> {
     try {
       const saltRounds = parseInt(this.configService.get<string>('SALT_ROUNDS'));
       const salt = await bcrypt.genSalt(saltRounds);
-      return await bcrypt.hash(password, salt);
+      return await bcrypt.hash(data, salt);
     } catch (error) {
       throw new InternalServerErrorException();
     }
   }
 
-  async comparePassword(password: string, hashedPassword: string): Promise<boolean> {
-    return await bcrypt.compare(password, hashedPassword);
+  async compareHash(inputString: string, hashedString: string): Promise<boolean> {
+    return await bcrypt.compare(inputString, hashedString);
   }
 
   getDBConfig(): TypeOrmModuleOptions {
