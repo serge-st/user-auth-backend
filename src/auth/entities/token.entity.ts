@@ -1,7 +1,8 @@
 import { User } from 'users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
 
 @Entity('tokens')
+@Unique(['userId'])
 export class Token {
   @PrimaryGeneratedColumn('uuid')
   id: string;
@@ -10,5 +11,6 @@ export class Token {
   refreshToken: string;
 
   @ManyToOne(() => User, (user) => user.id)
+  @JoinColumn({ name: 'userId' })
   userId: User['id'];
 }

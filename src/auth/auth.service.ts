@@ -14,15 +14,19 @@ import { SignInResponse } from './types/singin-response.type';
 import { CreateUserDto } from 'users/dto/create-user.dto';
 import { MailService } from 'mail/mail.service';
 import { User } from 'users/entities/user.entity';
+import { Repository } from 'typeorm';
+import { Token } from './entities/token.entity';
+import { InjectRepository } from '@nestjs/typeorm';
 
 @Injectable()
 export class AuthService {
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-    private mailService: MailService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly mailService: MailService,
     private readonly utilsService: UtilsService,
     private readonly configService: ConfigService,
+    @InjectRepository(Token) private readonly tokensRepository: Repository<Token>,
   ) {}
 
   async generateTokens(userInfo: User): Promise<SignInResponse> {
@@ -65,7 +69,7 @@ export class AuthService {
       await this.saveRefreshToken(user.id, tokens.refresh_token);
       return tokens;
     } catch (error) {
-      if (error instanceof NotFoundException) {
+      if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
         throw new UnauthorizedException('Please check your login credentials');
       }
       if (error instanceof BadRequestException) {
@@ -77,6 +81,6 @@ export class AuthService {
 
   async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
     const tokenHash = await this.utilsService.hashData(refreshToken);
-    console.log('saveRefreshToken', userId, tokenHash);
+    await this.tokensRepository.upsert({ userId, refreshToken: tokenHash }, ['userId']);
   }
 }
