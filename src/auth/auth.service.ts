@@ -61,6 +61,20 @@ export class AuthService {
     }
   }
 
+  async refresh(userId: number, refreshToken: string) {
+    console.log('AuthService refresh userId', userId);
+    // get user from the db, join tokens collumn and get token
+    const hashedTokenFromDb = refreshToken;
+    const result = await this.utilsService.compareHash(refreshToken, hashedTokenFromDb);
+    console.log('AuthService refresh result', result);
+    // if result negative ForbiddenException
+    // if ok - generate new tokens and save new refresh token to the db
+  }
+
+  async signOut(id: number): Promise<void> {
+    this.deleteRefreshToken(id);
+  }
+
   async generateTokens(userInfo: User): Promise<SignInResponse> {
     const payload: JWTPayload = { sub: userInfo.id, username: userInfo.username };
     const [access_token, refresh_token] = await Promise.all([
@@ -82,5 +96,9 @@ export class AuthService {
   async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
     const tokenHash = await this.utilsService.hashData(refreshToken);
     await this.tokensRepository.upsert({ userId, refreshToken: tokenHash }, ['userId']);
+  }
+
+  async deleteRefreshToken(userId: number): Promise<void> {
+    await this.tokensRepository.delete({ userId });
   }
 }
