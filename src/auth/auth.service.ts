@@ -29,24 +29,6 @@ export class AuthService {
     @InjectRepository(Token) private readonly tokensRepository: Repository<Token>,
   ) {}
 
-  async generateTokens(userInfo: User): Promise<SignInResponse> {
-    const payload: JWTPayload = { sub: userInfo.id, username: userInfo.username };
-    const [access_token, refresh_token] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        expiresIn: 60 * 15,
-        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-      }),
-      this.jwtService.signAsync(payload, {
-        expiresIn: 60 * 60 * 24 * 30,
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      }),
-    ]);
-    return {
-      access_token,
-      refresh_token,
-    };
-  }
-
   async signUp(createUserDto: CreateUserDto): Promise<SignInResponse> {
     const newUser = await this.usersService.create(createUserDto);
     const activationLink = this.utilsService.getUUID();
@@ -77,6 +59,24 @@ export class AuthService {
       }
       throw new InternalServerErrorException();
     }
+  }
+
+  async generateTokens(userInfo: User): Promise<SignInResponse> {
+    const payload: JWTPayload = { sub: userInfo.id, username: userInfo.username };
+    const [access_token, refresh_token] = await Promise.all([
+      this.jwtService.signAsync(payload, {
+        expiresIn: 60 * 15,
+        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
+      }),
+      this.jwtService.signAsync(payload, {
+        expiresIn: 60 * 60 * 24 * 30,
+        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
+      }),
+    ]);
+    return {
+      access_token,
+      refresh_token,
+    };
   }
 
   async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {

@@ -8,6 +8,7 @@ import { v4 as uuidv4 } from 'uuid';
 @Injectable()
 export class UtilsService {
   constructor(private readonly configService: ConfigService) {}
+
   async hashData(data: string): Promise<string> {
     try {
       const saltRounds = parseInt(this.configService.get<string>('SALT_ROUNDS'));
