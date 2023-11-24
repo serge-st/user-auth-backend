@@ -1,5 +1,5 @@
 import { Column, CreateDateColumn, Entity, PrimaryGeneratedColumn } from 'typeorm';
-import { Exclude } from 'class-transformer';
+import { Exclude, Transform } from 'class-transformer';
 
 @Entity({ name: 'users' })
 export class User {
@@ -22,7 +22,8 @@ export class User {
   @Column({ type: 'varchar', length: 50, nullable: true })
   name: string;
 
-  @CreateDateColumn({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP(6)', name: 'created_at' })
+  @CreateDateColumn({ type: 'timestamptz', default: () => 'CURRENT_TIMESTAMP(6)', name: 'created_at' })
+  @Transform(({ value }) => value.toISOString())
   createdAt: Date;
 
   // TODO:
