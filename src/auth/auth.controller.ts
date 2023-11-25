@@ -1,8 +1,7 @@
 import { Body, Controller, Post, HttpCode, HttpStatus, UseGuards } from '@nestjs/common';
 import { AuthService } from './auth.service';
-import { GetUserData } from './decorators';
+import { GetUserData, Public } from './decorators';
 import { AuthCredentialsDto } from './dto';
-import { AccessTokenGuard } from './guards';
 import { RefreshTokenGuard } from './guards';
 import { CreateUserDto } from 'users/dto';
 
@@ -10,12 +9,13 @@ import { CreateUserDto } from 'users/dto';
 export class AuthController {
   constructor(private authService: AuthService) {}
 
-  // TODO: return tokens and user object
+  @Public()
   @Post('signup')
   create(@Body() createUserDto: CreateUserDto) {
     return this.authService.signUp(createUserDto);
   }
 
+  @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
   signIn(@Body() authCredentialsDto: AuthCredentialsDto) {
@@ -23,7 +23,6 @@ export class AuthController {
     return this.authService.signIn(username, email, password);
   }
 
-  @UseGuards(AccessTokenGuard)
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
   signOut(@GetUserData('sub') userId: number) {
@@ -31,6 +30,7 @@ export class AuthController {
     this.authService.signOut(userId);
   }
 
+  @Public()
   @UseGuards(RefreshTokenGuard)
   @HttpCode(HttpStatus.OK)
   @Post('refresh')
