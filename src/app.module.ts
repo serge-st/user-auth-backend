@@ -10,6 +10,7 @@ import { UtilsService } from 'utils/utils.service';
 import { AuthModule } from 'auth/auth.module';
 import { JwtModule } from '@nestjs/jwt';
 import { MailModule } from 'mail/mail.module';
+import { TokensModule } from './tokens/tokens.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { MailModule } from 'mail/mail.module';
     UtilsModule,
     AuthModule,
     MailModule,
+    TokensModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -8,18 +8,11 @@ import { ConfigModule } from '@nestjs/config';
 import { AccessTokenStrategy } from './strategies/access-token.strategy';
 import { RefreshTokenStrategy } from './strategies/refresh-token.strategy';
 import { MailModule } from 'mail/mail.module';
-import { Token } from './entities/token.entity';
-import { TypeOrmModule } from '@nestjs/typeorm';
+
+import { TokensModule } from 'tokens/tokens.module';
 
 @Module({
-  imports: [
-    TypeOrmModule.forFeature([Token]),
-    UsersModule,
-    UtilsModule,
-    ConfigModule,
-    JwtModule.register({}),
-    MailModule,
-  ],
+  imports: [UsersModule, UtilsModule, ConfigModule, JwtModule.register({}), MailModule, TokensModule],
   providers: [AuthService, AccessTokenStrategy, RefreshTokenStrategy],
   controllers: [AuthController],
 })

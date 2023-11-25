@@ -11,12 +11,14 @@ import { Repository } from 'typeorm';
 import { User } from './entities/user.entity';
 import { UtilsService } from 'utils/utils.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { TokensService } from 'tokens/tokens.service';
 
 @Injectable()
 export class UsersService {
   constructor(
     @InjectRepository(User) private readonly usersRepository: Repository<User>,
     private readonly utilsService: UtilsService,
+    private readonly tokensService: TokensService,
   ) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
@@ -100,6 +102,7 @@ export class UsersService {
   }
 
   async remove(id: number): Promise<void> {
+    await this.tokensService.deleteRefreshToken(id);
     const result = await this.usersRepository.delete(id);
     if (result.affected === 0) {
       throw new NotFoundException(`User with ID ${id} was not found`);

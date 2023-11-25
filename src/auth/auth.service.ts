@@ -1,5 +1,6 @@
 import {
   BadRequestException,
+  ForbiddenException,
   Injectable,
   InternalServerErrorException,
   NotFoundException,
@@ -7,26 +8,18 @@ import {
 } from '@nestjs/common';
 import { UsersService } from 'users/users.service';
 import { UtilsService } from 'utils/utils.service';
-import { JwtService } from '@nestjs/jwt';
-import { ConfigService } from '@nestjs/config';
-import { JWTPayload } from './types/jwt-payload.type';
 import { SignInResponse } from './types/singin-response.type';
 import { CreateUserDto } from 'users/dto/create-user.dto';
 import { MailService } from 'mail/mail.service';
-import { User } from 'users/entities/user.entity';
-import { Repository } from 'typeorm';
-import { Token } from './entities/token.entity';
-import { InjectRepository } from '@nestjs/typeorm';
+import { TokensService } from 'tokens/tokens.service';
 
 @Injectable()
 export class AuthService {
   constructor(
     private readonly usersService: UsersService,
-    private readonly jwtService: JwtService,
     private readonly mailService: MailService,
     private readonly utilsService: UtilsService,
-    private readonly configService: ConfigService,
-    @InjectRepository(Token) private readonly tokensRepository: Repository<Token>,
+    private readonly tokensService: TokensService,
   ) {}
 
   async signUp(createUserDto: CreateUserDto): Promise<SignInResponse> {
@@ -34,8 +27,8 @@ export class AuthService {
     const activationLink = this.utilsService.getUUID();
     // TODO: Should I save activationLink to the users table?
     await this.mailService.sendActivationLink(newUser.email, activationLink);
-    const tokens = await this.generateTokens(newUser);
-    await this.saveRefreshToken(newUser.id, tokens.refresh_token);
+    const tokens = await this.tokensService.generateTokens(newUser);
+    await this.tokensService.saveRefreshToken(newUser.id, tokens.refresh_token);
     return tokens;
   }
 
@@ -47,8 +40,9 @@ export class AuthService {
         throw new UnauthorizedException('Please check you login credentials');
       }
 
-      const tokens = await this.generateTokens(user);
-      await this.saveRefreshToken(user.id, tokens.refresh_token);
+      const tokens = await this.tokensService.generateTokens(user);
+      console.log('tokens', tokens);
+      await this.tokensService.saveRefreshToken(user.id, tokens.refresh_token);
       return tokens;
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
@@ -61,44 +55,19 @@ export class AuthService {
     }
   }
 
-  async refresh(userId: number, refreshToken: string) {
-    console.log('AuthService refresh userId', userId);
-    // get user from the db, join tokens collumn and get token
-    const hashedTokenFromDb = refreshToken;
-    const result = await this.utilsService.compareHash(refreshToken, hashedTokenFromDb);
-    console.log('AuthService refresh result', result);
-    // if result negative ForbiddenException
-    // if ok - generate new tokens and save new refresh token to the db
+  async refresh(userId: number, refreshToken: string): Promise<SignInResponse> {
+    const tokenWithUserDetails = await this.tokensService.getTokenWithUser(userId);
+    if (!tokenWithUserDetails) throw new UnauthorizedException();
+
+    const { refreshToken: hashedRefreshToken, userDetails } = tokenWithUserDetails;
+    const isTokenMatching = await this.utilsService.compareHash(refreshToken, hashedRefreshToken);
+    if (!isTokenMatching) throw new ForbiddenException();
+    const tokens = await this.tokensService.generateTokens(userDetails);
+    await this.tokensService.saveRefreshToken(userId, tokens.refresh_token);
+    return tokens;
   }
 
   async signOut(id: number): Promise<void> {
-    this.deleteRefreshToken(id);
-  }
-
-  async generateTokens(userInfo: User): Promise<SignInResponse> {
-    const payload: JWTPayload = { sub: userInfo.id, username: userInfo.username };
-    const [access_token, refresh_token] = await Promise.all([
-      this.jwtService.signAsync(payload, {
-        expiresIn: 60 * 15,
-        secret: this.configService.get<string>('JWT_ACCESS_SECRET'),
-      }),
-      this.jwtService.signAsync(payload, {
-        expiresIn: 60 * 60 * 24 * 30,
-        secret: this.configService.get<string>('JWT_REFRESH_SECRET'),
-      }),
-    ]);
-    return {
-      access_token,
-      refresh_token,
-    };
-  }
-
-  async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
-    const tokenHash = await this.utilsService.hashData(refreshToken);
-    await this.tokensRepository.upsert({ userId, refreshToken: tokenHash }, ['userId']);
-  }
-
-  async deleteRefreshToken(userId: number): Promise<void> {
-    await this.tokensRepository.delete({ userId });
+    this.tokensService.deleteRefreshToken(id);
   }
 }

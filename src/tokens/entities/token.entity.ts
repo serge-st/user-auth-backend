@@ -1,5 +1,5 @@
 import { User } from 'users/entities/user.entity';
-import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, JoinColumn, Unique } from 'typeorm';
+import { Entity, PrimaryGeneratedColumn, Column, JoinColumn, Unique, OneToOne } from 'typeorm';
 
 @Entity({ name: 'tokens' })
 @Unique(['userId'])
@@ -10,7 +10,7 @@ export class Token {
   @Column({ type: 'varchar', name: 'refresh_token' })
   refreshToken: string;
 
-  @ManyToOne(() => User, (user) => user.id)
+  @OneToOne(() => User)
   @JoinColumn({ name: 'user_id' })
   userId: User['id'];
 }
