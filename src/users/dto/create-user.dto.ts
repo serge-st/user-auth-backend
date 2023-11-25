@@ -16,7 +16,7 @@ export class CreateUserDto {
 
   @IsNotEmpty()
   @IsString()
-  @Length(8, 20)
+  @Length(8, 71)
   @Matches(passwordRegex, {
     message: `The password is too weak. The password should contain at least 1 upper case letter, 1 lower case letter, 1 number or special character`,
   })

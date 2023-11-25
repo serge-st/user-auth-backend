@@ -13,7 +13,7 @@ export class User {
   email: string;
 
   @Exclude()
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', length: 72 })
   password: string;
 
   @Column({ type: 'boolean', default: false, name: 'is_active' })
