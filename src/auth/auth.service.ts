@@ -35,13 +35,12 @@ export class AuthService {
   async signIn(username: string, email: string, password: string): Promise<SignInResponse> {
     try {
       const user = await this.usersService.getByUsernameOrEmail(username, email);
-      const isPasswordValid = await this.utilsService.compareHash(password, user.password);
+      const isPasswordValid = await this.utilsService.comparePassword(password, user.password);
       if (!isPasswordValid) {
         throw new UnauthorizedException('Please check you login credentials');
       }
 
       const tokens = await this.tokensService.generateTokens(user);
-      console.log('tokens', tokens);
       await this.tokensService.saveRefreshToken(user.id, tokens.refresh_token);
       return tokens;
     } catch (error) {
@@ -60,7 +59,7 @@ export class AuthService {
     if (!tokenWithUserDetails) throw new UnauthorizedException();
 
     const { refreshToken: hashedRefreshToken, userDetails } = tokenWithUserDetails;
-    const isTokenMatching = await this.utilsService.compareHash(refreshToken, hashedRefreshToken);
+    const isTokenMatching = this.utilsService.compareDataSHA256(refreshToken, hashedRefreshToken);
     if (!isTokenMatching) throw new ForbiddenException();
     const tokens = await this.tokensService.generateTokens(userDetails);
     await this.tokensService.saveRefreshToken(userId, tokens.refresh_token);

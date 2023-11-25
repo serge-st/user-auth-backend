@@ -3,13 +3,14 @@ import { InternalServerErrorException } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import * as bcrypt from 'bcrypt';
+import * as sha256 from 'crypto-js/sha256';
 import { v4 as uuidv4 } from 'uuid';
 
 @Injectable()
 export class UtilsService {
   constructor(private readonly configService: ConfigService) {}
 
-  async hashData(data: string): Promise<string> {
+  async hashPassword(data: string): Promise<string> {
     try {
       const saltRounds = parseInt(this.configService.get<string>('SALT_ROUNDS'));
       const salt = await bcrypt.genSalt(saltRounds);
@@ -19,8 +20,18 @@ export class UtilsService {
     }
   }
 
-  async compareHash(inputString: string, hashedString: string): Promise<boolean> {
+  async comparePassword(inputString: string, hashedString: string): Promise<boolean> {
     return await bcrypt.compare(inputString, hashedString);
+  }
+
+  hashDataSHA256(data: string): string {
+    const result = sha256(data).toString();
+    console.log('UtilsService hashData256 result', result);
+    return sha256(data).toString();
+  }
+
+  compareDataSHA256(data: string, hash: string): boolean {
+    return sha256(data).toString() === hash;
   }
 
   getDBConfig(): TypeOrmModuleOptions {

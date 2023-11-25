@@ -23,7 +23,7 @@ export class UsersService {
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { password } = createUserDto;
-    const hashedPassword = await this.utilsService.hashData(password);
+    const hashedPassword = await this.utilsService.hashPassword(password);
     const newUser = this.usersRepository.create({
       ...createUserDto,
       password: hashedPassword,
@@ -83,7 +83,7 @@ export class UsersService {
     const user = await this.getById(id);
     const { password } = updateUserDto;
     if (password) {
-      const hashedPassword = await this.utilsService.hashData(password);
+      const hashedPassword = await this.utilsService.hashPassword(password);
       updateUserDto.password = hashedPassword;
     }
     const updatedUser = this.usersRepository.create({ id, ...updateUserDto });

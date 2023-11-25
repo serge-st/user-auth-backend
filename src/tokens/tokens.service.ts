@@ -47,7 +47,7 @@ export class TokensService {
   }
 
   async saveRefreshToken(userId: number, refreshToken: string): Promise<void> {
-    const tokenHash = await this.utilsService.hashData(refreshToken);
+    const tokenHash = this.utilsService.hashDataSHA256(refreshToken);
     await this.tokensRepository.upsert({ userId, refreshToken: tokenHash }, ['userId']);
   }
 
