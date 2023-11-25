@@ -1,14 +1,14 @@
 import { Injectable } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Token } from './entities/token.entity';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
-import { SignInResponse } from 'auth/types/singin-response.type';
 import { Repository } from 'typeorm';
-import { User } from 'users/entities/user.entity';
+import { Token } from './entities/token.entity';
 import { JWTPayload } from './types/jwt-payload.type';
-import { UtilsService } from 'utils/utils.service';
 import { TokenWithUserDetails } from './types/token-with-user-details.type';
+import { UtilsService } from 'utils/utils.service';
+import { SignInResponse } from 'auth/types';
+import { User } from 'users/entities';
 
 @Injectable()
 export class TokensService {

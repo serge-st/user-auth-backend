@@ -5,12 +5,12 @@ import {
   InternalServerErrorException,
   NotFoundException,
 } from '@nestjs/common';
-import { CreateUserDto } from './dto/create-user.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
+import { CreateUserDto } from './dto/create-user.dto';
 import { User } from './entities/user.entity';
-import { UtilsService } from 'utils/utils.service';
 import { UpdateUserDto } from './dto/update-user.dto';
+import { UtilsService } from 'utils/utils.service';
 import { TokensService } from 'tokens/tokens.service';
 
 @Injectable()

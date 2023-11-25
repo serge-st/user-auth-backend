@@ -8,10 +8,10 @@ import {
 } from '@nestjs/common';
 import { UsersService } from 'users/users.service';
 import { UtilsService } from 'utils/utils.service';
-import { SignInResponse } from './types/singin-response.type';
-import { CreateUserDto } from 'users/dto/create-user.dto';
-import { MailService } from 'mail/mail.service';
+import { SignInResponse } from './types';
+import { CreateUserDto } from 'users/dto';
 import { TokensService } from 'tokens/tokens.service';
+import { MailService } from 'mail/mail.service';
 
 @Injectable()
 export class AuthService {
