@@ -12,6 +12,7 @@ import { SignInResponse } from './types';
 import { CreateUserDto } from 'users/dto';
 import { TokensService } from 'tokens/tokens.service';
 import { MailService } from 'mail/mail.service';
+import { TokenResponse } from 'tokens/types';
 
 @Injectable()
 export class AuthService {
@@ -29,7 +30,10 @@ export class AuthService {
     await this.mailService.sendActivationLink(newUser.email, activationLink);
     const tokens = await this.tokensService.generateTokens(newUser);
     await this.tokensService.saveRefreshToken(newUser.id, tokens.refresh_token);
-    return tokens;
+    return {
+      ...tokens,
+      user: newUser,
+    };
   }
 
   async signIn(username: string, email: string, password: string): Promise<SignInResponse> {
@@ -42,7 +46,10 @@ export class AuthService {
 
       const tokens = await this.tokensService.generateTokens(user);
       await this.tokensService.saveRefreshToken(user.id, tokens.refresh_token);
-      return tokens;
+      return {
+        ...tokens,
+        user,
+      };
     } catch (error) {
       if (error instanceof NotFoundException || error instanceof UnauthorizedException) {
         throw new UnauthorizedException('Please check your login credentials');
@@ -54,7 +61,7 @@ export class AuthService {
     }
   }
 
-  async refresh(userId: number, refreshToken: string): Promise<SignInResponse> {
+  async refresh(userId: number, refreshToken: string): Promise<TokenResponse> {
     const tokenWithUserDetails = await this.tokensService.getTokenWithUser(userId);
     if (!tokenWithUserDetails) throw new UnauthorizedException();
 

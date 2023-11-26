@@ -4,6 +4,7 @@ import { GetUserData, Public } from './decorators';
 import { AuthCredentialsDto } from './dto';
 import { RefreshTokenGuard } from './guards';
 import { CreateUserDto } from 'users/dto';
+import { SignInResponse } from './types';
 
 @Controller('auth')
 export class AuthController {
@@ -18,7 +19,7 @@ export class AuthController {
   @Public()
   @HttpCode(HttpStatus.OK)
   @Post('login')
-  signIn(@Body() authCredentialsDto: AuthCredentialsDto) {
+  signIn(@Body() authCredentialsDto: AuthCredentialsDto): Promise<SignInResponse> {
     const { username, email, password } = authCredentialsDto;
     return this.authService.signIn(username, email, password);
   }

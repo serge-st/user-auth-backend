@@ -6,8 +6,8 @@ import { Repository } from 'typeorm';
 import { Token } from './entities/token.entity';
 import { JWTPayload } from './types/jwt-payload.type';
 import { TokenWithUserDetails } from './types/token-with-user-details.type';
+import { TokenResponse } from './types/token-response.type';
 import { UtilsService } from 'utils/utils.service';
-import { SignInResponse } from 'auth/types';
 import { User } from 'users/entities';
 
 @Injectable()
@@ -19,7 +19,7 @@ export class TokensService {
     private readonly utilsService: UtilsService,
   ) {}
 
-  async generateTokens(userInfo: User): Promise<SignInResponse> {
+  async generateTokens(userInfo: User): Promise<TokenResponse> {
     const payload: JWTPayload = { sub: userInfo.id, username: userInfo.username };
     const [access_token, refresh_token] = await Promise.all([
       this.jwtService.signAsync(payload, {
