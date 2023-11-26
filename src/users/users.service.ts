@@ -93,7 +93,6 @@ export class UsersService {
     } catch (error) {
       const { code, detail } = error;
       if (code === '23505') {
-        console.log('error', code);
         throw new ConflictException(detail);
       } else {
         throw new InternalServerErrorException();

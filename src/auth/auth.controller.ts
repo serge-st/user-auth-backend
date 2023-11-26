@@ -27,7 +27,6 @@ export class AuthController {
   @HttpCode(HttpStatus.NO_CONTENT)
   @Post('logout')
   signOut(@GetUserData('sub') userId: number) {
-    console.log('AuthController signOut id', userId);
     this.authService.signOut(userId);
   }
 

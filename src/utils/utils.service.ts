@@ -25,8 +25,6 @@ export class UtilsService {
   }
 
   hashDataSHA256(data: string): string {
-    const result = sha256(data).toString();
-    console.log('UtilsService hashData256 result', result);
     return sha256(data).toString();
   }
 
